@@ -1,0 +1,64 @@
+In order to use the ML Security Compliance Monitor lambda we need to do some prepration.
+Required Environment Variables:
+REPORT_BUCKET: ml-security-reports-{account}-{region}
+ALERT_TOPIC_ARN: arn:aws:sns:{region}:{account}:ml-security-alerts
+COMPLIANCE_LEVEL: STRICT
+MIN_ENCRYPTION_LEVEL: AES256
+ALLOWED_REGIONS: ["us-east-1", "eu-west-1"]
+SECURITY_CONTACT: security@company.com
+
+Basic Configuration:
+Runtime: Python 3.12
+Architecture: arm64 (better cost optimization)
+Memory: 512 MB (for parallel processing)
+Timeout: 5 minutes (300 seconds)
+Concurrent executions: 10 (adjustable based on workload)
+
+VPC Configuration(iF NEEDED):
+VPC: Required if accessing VPC resources
+Subnets: At least 2 private subnets in different AZs
+Security Group:
+  - Outbound: Allow HTTPS (443) to all
+  - Inbound: None required
+VPC Endpoints needed:
+  - com.amazonaws.[region].s3
+  - com.amazonaws.[region].ecr.api
+  - com.amazonaws.[region].ecr.dkr
+  - com.amazonaws.[region].sagemaker.api
+  - com.amazonaws.[region].logs
+  - com.amazonaws.[region].sns
+
+Trigger Configuration(EventBridge for daily report):
+EventBridge (CloudWatch Events):
+  Schedule: rate(24 hours)
+  # or
+  Schedule: cron(0 0 * * ? *)  # Daily at midnight UTC
+
+Lambda IAM execution role:
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:List*",
+                "sagemaker:Describe*",
+                "s3:List*",
+                "s3:Get*",
+                "ecr:Describe*",
+                "cloudtrail:LookupEvents",
+                "config:Get*",
+                "securityhub:BatchImportFindings",
+                "sns:Publish"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::${REPORT_BUCKET}/*"
+        }
+    ]
+}
