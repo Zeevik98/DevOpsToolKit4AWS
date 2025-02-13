@@ -1,3 +1,21 @@
+Lambda Details:
+Runtime: Python 3.12
+Memory: 256MB
+Timeout: 5 minutes (300 seconds)
+Trigger: EventBridge (CloudWatch Events) rule - daily schedule(Or any other trigger that fits to your needs)
+
+Execution order:
+1.Scan all AWS regions for ACM certificates
+2.Check each certificate for:
+-Expiration date
+-Validation status
+-Domain validation
+3.Send alerts via SNS for:
+-Certificates expiring within 7 days (CRITICAL)
+-Certificates expiring within 30 days (WARNING)
+-Certificates with validation issues
+4.Return a complete inventory with status summary
+
 For using the ACM servics lambda which utilaise the native AWS servicees to be used as a single source of truth for all CA cwrts in the organisation there are few steps needed:
 1.Lambda execution policy:
 {
