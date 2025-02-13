@@ -1,0 +1,58 @@
+Lmabda opration:
+1.Collects 7 days of cost data using Cost Explorer
+2.Gathers EC2 instance utilization metrics
+3.Identifies underutilized instances (< 20% CPU)
+4.Generates a comprehensive report with:
+-Total and average daily costs
+-Service-wise cost breakdown
+-Potential waste identification
+-Resource optimization recommendations
+5.Stores the detailed report in S3
+S6.ends a summary via SNS
+
+The following steps needed for oprating the lambda:
+1.Lambda IAM execution role permissions:
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ce:GetCostAndUsage",
+                "ec2:DescribeInstances",
+                "cloudwatch:GetMetricStatistics",
+                "sns:Publish",
+                "s3:PutObject"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+2.S3 bucket for results.
+3.SNS topic to allow the massage with the report content to be sent to the relvant team members.for you convinance here is a step by step guide for this:
+
+GUIDE:
+1.Login to AWS Console and Navigate to SNS
+2.Search for "SNS" in the services search bar and Click on "Simple Notification Service"
+3.In the left sidebar, click on "Topics"
+4.Click the orange "Create topic" button
+5.Choose "Standard" for the topic type
+6.Configure Topic Details
+Name: Enter a name (e.g., "ResourceUtilizationReports")
+Display name (optional): Enter a display name for SMS messages
+Leave other settings as default
+Click "Create topic"
+7.After topic creation, you'll be taken to the topic details page
+8.Click "Create subscription"
+9.Choose "Protocol": Select "Email"
+10.Enter the destination email address in "Endpoint"
+11.Click "Create subscription"
+12.Check the email inbox of the address you entered for an email from AWS
+13.Click the "Confirm subscription" link in the email
+
+NEXT:
+Note the Topic ARN
+Go back to the topic details page
+Copy the Topic ARN (it looks like: arn:aws:sns:region:account-id:topic-name)
+This is the ARN you'll use in the Lambda environment variable
