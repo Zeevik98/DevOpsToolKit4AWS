@@ -1,0 +1,27 @@
+For using the ACM servics lambda which utilaise the native AWS servicees to be used as a single source of truth for all CA cwrts in the organisation there are few steps needed:
+1.Lambda execution policy:
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "acm:ListCertificates",
+                "acm:DescribeCertificate",
+                "ec2:DescribeRegions"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": "arn:aws:sns:*:*:CertificateAlerts"
+        }
+    ]
+}
+
+2.Creation of SNS topic:
+The ARN of the topic will be used as an enviormental variables.
+3.Mapping and uploading ALL the relvant and used certificates to the ACM. Without this the lambda will not be effective.
