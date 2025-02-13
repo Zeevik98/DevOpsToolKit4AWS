@@ -1,0 +1,67 @@
+The NamingVerifyLambda is meant to simplify the enforcment of proper tagging and naming for resources in your AWS enviorment.
+For your convinance this document provide the needed preprations in order to implamane this in your own enviorment.
+Lambda basic configurations:
+Runtime: Python 3.12
+Memory: 256 MB
+Timeout: 30 seconds
+Architecture: arm64
+
+Lambda IAM execution role policy:
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags",
+                "s3:PutBucketTagging",
+                "rds:AddTagsToResource",
+                "lambda:TagResource"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": "arn:aws:sns:*:*:ResourceTagging"
+        }
+    ]
+}
+
+Enviorment variables:
+# Naming Patterns
+EC2_PATTERN: {env}-{service}-{purpose}
+S3_PATTERN: {env}-{team}-{purpose}
+RDS_PATTERN: {env}-{service}-{purpose}
+LAMBDA_PATTERN: {env}-{service}-{function}
+DEFAULT_PATTERN: {env}-{service}
+
+# Valid Values
+VALID_ENVIRONMENTS: ["dev", "staging", "prod"]
+VALID_TEAMS: ["devops", "security", "data", "backend", "frontend"]
+VALID_SERVICES: ["app", "auth", "api", "db", "cache", "queue"]
+
+# Required Tags
+REQUIRED_TAGS: {"Environment", "Owner", "CostCenter", "Project", "SecurityLevel"}
+DEFAULT_OWNER: devops-team
+COST_CENTER: tech-ops
+DEFAULT_PROJECT: core-infrastructure
+
+# Notifications
+SNS_TOPIC_ARN: arn:aws:sns:region:account:resource-tagging
+ENABLE_ALERTS: true
+
+# Compliance
+STRICT_MODE: true
+AUTO_REMEDIATE: false
+
+Tags for the lambda:
+Name: resource-tagging-validator
+Environment: prod
+Service: compliance
+Owner: devops-team
+CostCenter: tech-ops
+Project: infrastructure-automation
+
