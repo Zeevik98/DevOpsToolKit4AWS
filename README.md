@@ -6,10 +6,7 @@ The current tools are:\
 1.**Utilisation detation lambda**\
 Know what is used across your AWS account in terms of usage\costs.
 
-2.**ACM AS MAIN**\
-Have a full visiabillity fo the certifications managed by the ACM, allowing you to use it as a single source of truth for CA managment.
-
-3.**Naming Verify Lambda**\
+2.**Naming Verify Lambda**\
 Enforce proper naming and tagging acrros your AWS account using this simple lambda automation.
 
 4.**ML Security Compliance Monitor**\
